@@ -39,11 +39,11 @@
 		</div>
 	</div>
 
-	<div class="modal modal_active">
+	<div class="modal">
 		<div class="modal__container">
 			<button class="modal__close" aria-label="закрыть"></button>
 			<div class="modal__content">
-				<div class="card card_full">
+				<div class="card card_full"> <!-- от сих модалка открытой карточки-->
 					<img class="card__image" src="<%=require('../images/Subtract.svg')%>" alt="" />
 					<div class="card__column">
 						<span class="card__category card__category_other">другое</span>
@@ -63,7 +63,7 @@
 		<div class="modal__container">
 			<button class="modal__close" aria-label="закрыть"></button>
 			<div class="modal__content">
-				<div class="basket">
+				<div class="basket"><!-- от сих модалка корзины-->
 					<h2 class="modal__title">Корзина</h2>
 					<ul class="basket__list">
 						<li class="basket__item card card_compact">
@@ -98,7 +98,7 @@
 		<div class="modal__container">
 			<button class="modal__close" aria-label="закрыть"></button>
 			<div class="modal__content">
-				<form class="form">
+				<form class="form"><!-- от сих модалка способа и адреса-->
 					<div class="order">
 						<div class="order__field">
 							<h2 class="modal__title">Способ оплаты</h2>
@@ -124,7 +124,7 @@
 		<div class="modal__container">
 			<button class="modal__close" aria-label="закрыть"></button>
 			<div class="modal__content">
-				<form class="form">
+				<form class="form"><!-- от сих модалка данных покупателя-->
 					<div class="order">
 						<label class="order__field">
 							<span class="form__label modal__title">Email</span>
@@ -147,7 +147,7 @@
 		<div class="modal__container">
 			<button class="modal__close" aria-label="закрыть"></button>
 			<div class="modal__content">
-				<div class="order-success">
+				<div class="order-success"><!-- от сих модалка успешного заказа-->
 					<h2 class="film__title">Заказ оформлен</h2>
 					<p class="film__description">Списано 153 250 синапсов</p>
 					<button class="button order-success__close">За новыми покупками!</button>
@@ -156,7 +156,7 @@
 		</div>
 	</div>
 
-	<template id="success">
+	<template id="success"><!-- темплейт модалка успешного заказа-->
 		<div class="order-success">
 			<h2 class="order-success__title">Заказ оформлен</h2>
 			<p class="order-success__description">Списано 0 синапсов</p>
@@ -164,7 +164,7 @@
 		</div>
 	</template>
 
-	<template id="card-catalog">
+	<template id="card-catalog"><!-- темплейт карточки в каталоге-->
 		<button class="gallery__item card">
 			<span class="card__category card__category_soft">софт-скил</span>
 			<h2 class="card__title">+1 час в сутках</h2>
@@ -173,7 +173,7 @@
 		</button>
 	</template>
 
-	<template id="card-preview">
+	<template id="card-preview"><!-- темплейт карточки большой-->
 		<div class="card card_full">
 			<img class="card__image" src="<%=require('../images/Subtract.svg')%>" alt="" />
 			<div class="card__column">
@@ -188,7 +188,7 @@
 		</div>
 	</template>
 
-	<template id="card-basket">
+	<template id="card-basket"><!-- темплейт карточки в корзине-->
 		<li class="basket__item card card_compact">
 			<span class="basket__item-index">1</span>
 			<span class="card__title">Фреймворк куки судьбы</span>
@@ -197,7 +197,7 @@
 		</li>
 	</template>
 
-	<template id="basket">
+	<template id="basket"><!-- темплейт модалка корзины-->
 		<div class="basket">
 			<h2 class="modal__title">Корзина</h2>
 			<ul class="basket__list"></ul>
@@ -208,7 +208,7 @@
 		</div>
 	</template>
 
-	<template id="order">
+	<template id="order"><!-- темплейт модалка выбора оплаты и адреса-->
 		<form class="form" name="order">
 			<div class="order">
 				<div class="order__field">
@@ -230,7 +230,7 @@
 		</form>
 	</template>
 
-	<template id="contacts">
+	<template id="contacts"><!-- темплейт модалка контактов--> 
 		<form class="form" name="contacts">
 			<div class="order">
 				<label class="order__field">
