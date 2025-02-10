@@ -142,19 +142,17 @@ export type TBasketItem = Pick<IProduct, 'id' | 'title' | 'price'>;
 - `constructor(container: HTMLElement, events: IEvents)`
 
 Необходимые поля класса:
-- `list: HTMLElement` - контейнер списока товаров в корзине,
+- `list: HTMLElement` - контейнер списка товаров в корзине,
 - `total: HTMLElement` - элемент отображения суммы товаров,
 - `orderButton: HTMLButtonElement` - кнопка оформления заказа,
-- `removeButton: HTMLButtonElement` - кнопка удаления товара из корзины,
 
 Методы класса:
 - `items(items: HTMLElement[])` - отображение списка товаров в корзине,
 - `selected(items: string[])` - включает/отключает кнопку заказа в зависимости от наличия товаров в корзине,
 - `total(total: number)` - отображение суммы товаров в корзине,
-- `removeItem(id: string)` - удаление товара из корзины,
 
 #### Класс Form
-Данный класс отвечает за обработку форм, изменение полей и валидацию перед отправкой.
+Данный класс базовый для обработки форм в проекте. Он управляет валидацией полей и отображением ошибок.
 - `constructor(container: HTMLFormElement, events: IEvents)`
 
 Необходимые поля класса:
@@ -167,25 +165,38 @@ export type TBasketItem = Pick<IProduct, 'id' | 'title' | 'price'>;
 - `render(state: Partial<T> & IFormState)` - обновляет состояние формы.
 
 #### Класс Order
-Класс расширяет Form и добавляет поддержку полей: способ оплаты, адрес, телефон и email.
+Класс расширяет Form и добавляет поддержку полей: способ оплаты, адрес.
 - `constructor(container: HTMLFormElement, events: IEvents)`
 
 Методы класса:
 - `setPayment(value: string)` -  устанавливает способ оплаты.
 - `setAddress(value: string)` -  устанавливает адрес.
+
+#### Класс Contacts
+Класс расширяет Form и добавляет поддержку полей: телефон и email.
+- `constructor(container: HTMLFormElement, events: IEvents)`
+
+Методы класса:
 - `setPhone(value: string)` -  устанавливает телефон.
 - `setEmail(value: string)` -  устанавливает email.
 
-#### Класс ProductCard
-Класс отображает товар в различных местах сайта и обрабатывает клики (открытие товара, добавление в корзину).
-- `constructor(container: HTMLElement, events: IEvents)` - конструктор класса, принимает темплейт элемента, что позволяет передать разные варианты отображения, так же устанавливаются слушатели на интерактивные элементы, по которым генерируются события.
+#### Класс Success
+Класс отображает сообщение об успешной покупке.
+- `constructor(container: HTMLElement, events: IEvents)`
 
+Поля класса:
+- `close: HTMLElement` - кнопка закрытия сообщения.
+
+#### Класс ProductCard
+Класс отображает карточку товара в различных вариациях и генерирует события с помощью брокера событий.
+- `constructor(templateId: string, events: IEvents)` - конструктор класса, принимает темплейт элемента по ID, что позволяет передать разные варианты отображения, так же принимает брокер для генерации событий.\
 Поля класса:
 - `title: HTMLElement` - заголовок товара,
 - `price: HTMLElement` - цена товара,
-- `image?: HTMLElement` - изображение товара,
+- `image?: HTMLImageElement` - изображение товара,
 - `decription?: HTMLElement` - описание товара,
-- `button?: HTMLButtonElement` - кнопка добавления товара в корзину,
+- `addButton?: HTMLButtonElement` - кнопка добавления товара в корзину,
+- `removeButton?: HTMLButtonElement` - кнопка удаления товара из корзины,
 
 Методы класса:
 - Сеттеры и геттеры для работы с данными товара.
@@ -204,7 +215,8 @@ export type TBasketItem = Pick<IProduct, 'id' | 'title' | 'price'>;
 - Сеттеры и геттеры для работы с данными товара.
 
 ### Взаимодействие
-Взаимодействие между классами реализовано через события генерируемые брокером событий. И обработчики этих событий описанных в `src/index.ts`\
+Взаимодействие между классами реализовано через события генерируемые брокером событий. И обработчики этих событий описанных в `src/index.ts`
+
 #### Список всех событий:
 События изменения данных:
 - `page:changed` - изменение главной страницы,
@@ -217,5 +229,6 @@ export type TBasketItem = Pick<IProduct, 'id' | 'title' | 'price'>;
 - `modal:close` - закрытие модального окна,
 - `basket:add` - добавление товара в корзину,
 - `basket:remove` - удаление товара из корзины,
-- `oreder: submit` - отправка формы заказа,
-- `order: validate` - валидация формы заказа.
+- `form:submit` - отправка формы заказа,
+- `form:validate` - валидация формы заказа.
+- `order:confirmed` - подтверждение заказа.
