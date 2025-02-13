@@ -1,9 +1,3 @@
-export interface IShopAPI {
-  getProducts(): Promise<IProduct[]>;
-  getProduct?(id: string): Promise<IProduct>;
-  postOrder?(order: IOrder): Promise<void>;
-}
-
 export interface IProduct {
   id: string;
   title: string;
@@ -21,27 +15,31 @@ export interface IOrderForm {
 }
 
 export interface IOrder extends IOrderForm {
-  orderList: IProduct[];
+  total: number;
+  items: string[];
 }
 
-export interface IProductModel {
-  products: IProduct[];
-  basket: TBasketItem[];
-  getProducts(): IProduct[];
+export interface IOrderResult {
+  id: string;
+  total: number;
+}
+
+export interface IProductData {
   setProducts(products: IProduct[]): void;
+  getProducts(): IProduct[];
   addItem(id: string): void;
   removeItem(id: string): void;
-  getBasket(): TBasketItem[];
+  getBasket(): IProduct[];
   getTotal(): number;
   clearBasket(): void;
 }
 
-export interface IOrderModel {
-  order: IOrder;
-  setOrder(order: IOrderForm): void;
+export interface IOrderData {
+  setOrder(order: IOrder): void;
+  getOrder(): IOrder;
   validateOrder(data: Record<keyof IOrderForm, string>): boolean;
   clearValidate(): void;
-  postOrder(): Promise<void>;
 }
 
 export type TBasketItem = Pick<IProduct, 'id' | 'title' | 'price'>;
+export type FormErrors = Partial<Record<keyof IOrderForm, string>>;

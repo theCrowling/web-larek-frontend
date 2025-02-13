@@ -49,6 +49,7 @@ export interface IProduct {
   image: string;
   price: number;
   category: string;
+  description: string;
 }
 ```
 ### Заказ
@@ -61,13 +62,18 @@ export interface IOrderForm {
 }
 
 export interface IOrder extends IOrderForm {
-  orderList: IProduct[];
+  total: number;
+  items: string[];
 }
 ```
 ### Типы данных
 Товары в корзине
 ```
 export type TBasketItem = Pick<IProduct, 'id' | 'title' | 'price'>;
+```
+Форма заказа
+```
+export type FormErrors = Partial<Record<keyof IOrderForm, string>>;
 ```
 
 ## Архитектура приложения
@@ -80,14 +86,15 @@ export type TBasketItem = Pick<IProduct, 'id' | 'title' | 'price'>;
 
 ### Базовый код
 #### Класс ShopAPI
-Получает информацию о товарах с сервера и отправляет оформленный заказ.\
+Осуществляет взаимодействие с сервером, получение товаров и отправка оформленного заказа.\
 Конструктор принимает параметры:
+- `cdn` - cdn сервера,
 - `baseUrl` - адрес сервера,
 
 Методы класса:
 - `getProducts(): Promise<IProduct[]>` — получение каталога товаров.
 - `getProduct(id: string): Promise<IProduct>` — получение товара по id.
-- `postOrder(order: IOrder): Promise<void>` — отправка заказа на сервер.
+- `postOrder(order: IOrder): Promise<IOrderResult>` — отправка заказа на сервер.
 
 #### Класс EventEmitter
 Брокер событий для отправки событий и подписки на них. Используется в презентере для обработки событий и в слоях приложения для генерации событий.\
@@ -98,33 +105,34 @@ export type TBasketItem = Pick<IProduct, 'id' | 'title' | 'price'>;
 - `trigger` - генерирующий заданное событие с заданными аргументами. Это позволяет передавать его в качестве обработчика события в другие классы.
 
 ### Слой модели.
-#### Класс ProductModel
-Класс отвечает за хранение данных о товаре и логику работы с корзиной товаров.\
+#### Класс ProductData
+Класс отвечает за хранение данных о товарах и логику работы с корзиной товаров.\
 Поля класса хранят данные:
 - `products: IProduct[]` - каталог товаров.
-- `basket: TBasketItem[]` - корзина с товаром.
+- `basket: IProduct[]` - корзина с товаром.
 - `events: IEvents` - экземпляр класса EventEmitter, для инициализации событий.
 
 Методы класса:
 - `getProducts(): IProduct[]` - получение каталога товаров.
-- `setProducts(products: IProduct[]): void` - заполнение каталога товаров.
+- `setProducts(products: IProduct[]): void` - установка каталога товаров.
 - `addItem(id: string): void` - добавление в корзину по идентификатору.
 - `removeItem(id: string): void` - удаление из корзины по идентификатору.
-- `getBasket(): TBasketItem[]` - получение корзины товаров.
+- `getBasket(): IProduct[]` - получение корзины товаров.
 - `getTotal(): number;` - получение суммы товаров в корзине.
 - `clearBasket(): void` - очистка корзины.
 
-#### Класс OrderModel
-Класс отвечает за хранение данные о заказе и обработку действий с формами.\
+#### Класс OrderData
+Класс отвечает за хранение данных о заказе и обработку действий с формами.\
 Поля класса хранят данные:
 - `order: IOrder;`  - данные заказа.
+- `formErrors: FormErrors` - ошибки валидации полей формы.
 - `events: IEvents` - экземпляр класса EventEmitter, для инициализации событий.
 
 Методы класса:
-- `setOrder(order: IOrderForm): void` - установка данных заказа.
-- `validateOrder(data: Record<keyof IOrderForm, string>): boolean` - валидация полей.
+- `setOrder(order: IOrder): void` - установка данных заказа.
+- `getOrder(): IOrder` - получение данных заказа.
+- `validateOrder(): boolean` - валидация полей.
 - `clearValidate(): void` - очистка валидации полей.
-- `postOrder(): void` - отправка заказа на сервер.
 
 ### Слой представления.
 Все классы представления наследуются от `Component.ts`, который реализует базовый функционал для создания компонентов.
@@ -221,8 +229,9 @@ export type TBasketItem = Pick<IProduct, 'id' | 'title' | 'price'>;
 События изменения данных:
 - `page:changed` - изменение главной страницы,
 - `products:changed` - изменение карточки товара,
-- `basket:changed` - обновление корзины,
-- `basket:clear` - очистка корзины,
+- `basket:changed` - изменение корзины,
+- `order:changed` - изменение данных заказа,
+- `formErrors:change` - изменение ошибок формы,
 
 События при взаимодействии с интерфейсом:
 - `modal:open` - открытие модального окна,
