@@ -22,7 +22,8 @@ export function ensureAllElements<T extends HTMLElement>(selectorElement: Select
     if (Array.isArray(selectorElement)) {
         return selectorElement;
     }
-    throw new Error(`Unknown selector element`);
+    console.warn(`Unknown selector element`);
+    return null
 }
 
 export type SelectorElement<T> = T | string;
@@ -34,15 +35,18 @@ export function ensureElement<T extends HTMLElement>(selectorElement: SelectorEl
             console.warn(`selector ${selectorElement} return more then one element`);
         }
         if (elements.length === 0) {
-            throw new Error(`selector ${selectorElement} return nothing`);
+          console.warn(`selector ${selectorElement} return nothing`);
+          return null
         }
         return elements.pop() as T;
     }
     if (selectorElement instanceof HTMLElement) {
         return selectorElement as T;
     }
-    throw new Error('Unknown selector element');
+    console.warn(`Unknown selector element`);
+    return null
 }
+
 
 export function cloneTemplate<T extends HTMLElement>(query: string | HTMLTemplateElement): T {
     const template = ensureElement(query) as HTMLTemplateElement;
@@ -100,6 +104,10 @@ export function isPlainObject(obj: unknown): obj is object {
 
 export function isBoolean(v: unknown): v is boolean {
     return typeof v === 'boolean';
+}
+
+export function formatNumber(x: number, sep = ' ') {
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, sep);
 }
 
 /**

@@ -115,8 +115,11 @@ export type FormErrors = Partial<Record<keyof IOrderForm, string>>;
 Методы класса:
 - `getProducts(): IProduct[]` - получение каталога товаров.
 - `setProducts(products: IProduct[]): void` - установка каталога товаров.
+- `getProduct(id: string): IProduct` - получение товара по идентификатору.
 - `addItem(id: string): void` - добавление в корзину по идентификатору.
 - `removeItem(id: string): void` - удаление из корзины по идентификатору.
+- `isInBascket(id: string): boolean` - проверка наличия товара в корзине.
+- `updateIndexes(): number` - обновление индексов товара в корзине.
 - `getBasket(): IProduct[]` - получение корзины товаров.
 - `getTotal(): number;` - получение суммы товаров в корзине.
 - `clearBasket(): void` - очистка корзины.
@@ -132,6 +135,7 @@ export type FormErrors = Partial<Record<keyof IOrderForm, string>>;
 - `setOrder(order: IOrder): void` - установка данных заказа.
 - `getOrder(): IOrder` - получение данных заказа.
 - `validateOrder(): boolean` - валидация полей.
+- `getFormErrors(): FormErrors` - получение ошибок валидации полей.
 - `clearValidate(): void` - очистка валидации полей.
 
 ### Слой представления.
@@ -156,7 +160,6 @@ export type FormErrors = Partial<Record<keyof IOrderForm, string>>;
 
 Методы класса:
 - `items(items: HTMLElement[])` - отображение списка товаров в корзине,
-- `selected(items: string[])` - включает/отключает кнопку заказа в зависимости от наличия товаров в корзине,
 - `total(total: number)` - отображение суммы товаров в корзине,
 
 #### Класс Form
@@ -197,14 +200,18 @@ export type FormErrors = Partial<Record<keyof IOrderForm, string>>;
 
 #### Класс ProductCard
 Класс отображает карточку товара в различных вариациях и генерирует события с помощью брокера событий.
-- `constructor(templateId: string, events: IEvents)` - конструктор класса, принимает темплейт элемента по ID, что позволяет передать разные варианты отображения, так же принимает брокер для генерации событий.\
+- `constructor(template: string, events: IEvents)` - конструктор класса, принимает темплейт элемента, что позволяет передать разные варианты отображения, так же принимает брокер для генерации событий.\
 Поля класса:
+- `element: HTMLElement` - контейнер карточки товара,
 - `title: HTMLElement` - заголовок товара,
 - `price: HTMLElement` - цена товара,
 - `image?: HTMLImageElement` - изображение товара,
 - `decription?: HTMLElement` - описание товара,
 - `addButton?: HTMLButtonElement` - кнопка добавления товара в корзину,
 - `removeButton?: HTMLButtonElement` - кнопка удаления товара из корзины,
+- `id: string` - идентификатор товара,
+- `itemIndex?: number` - порядковый номер товара,
+- `colorCategory?: Record <string, string>` - цвет категории товара,
 
 Методы класса:
 - Сеттеры и геттеры для работы с данными товара.
@@ -228,16 +235,19 @@ export type FormErrors = Partial<Record<keyof IOrderForm, string>>;
 #### Список всех событий:
 События изменения данных:
 - `page:changed` - изменение главной страницы,
-- `products:changed` - изменение карточки товара,
+- `products:changed` - изменение каталога товара,
 - `basket:changed` - изменение корзины,
 - `order:changed` - изменение данных заказа,
 - `formErrors:change` - изменение ошибок формы,
 
 События при взаимодействии с интерфейсом:
+- `product:click` - клик на карточку товара,
 - `modal:open` - открытие модального окна,
 - `modal:close` - закрытие модального окна,
 - `basket:add` - добавление товара в корзину,
 - `basket:remove` - удаление товара из корзины,
+- `basket:open` - открытие корзины,
+- `order:open` - открытие формы заказа,
 - `form:submit` - отправка формы заказа,
 - `form:validate` - валидация формы заказа.
 - `order:confirmed` - подтверждение заказа.

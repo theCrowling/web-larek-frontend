@@ -5,11 +5,13 @@ import { Model } from "./base/Model";
 export class ProductData extends Model<IProduct[]> implements IProductData {
   private products: IProduct[];
   private basket: IProduct[];
+  // private preview: IProduct | null;
 
   constructor(events: IEvents) {
     super([], events);
     this.products = [];
     this.basket = [];
+    // this.preview = null;
   }
 
   setProducts(products: IProduct[]) {
@@ -21,29 +23,41 @@ export class ProductData extends Model<IProduct[]> implements IProductData {
     return this.products;
   }
 
-  // Если нужно через геттер и сеттер
-  // get products(): IProduct[] {
-  //   return this._products;
+  getProduct(id: string): IProduct {
+    return this.products.find(product => product.id === id);
+  }
+
+  // не используется
+  // setPreview(product: IProduct) {
+  //   this.preview = product;
+  //   this.events.emit('preview:changed', product)
   // }
 
-  // set products(products: IProduct[]) {
-  //   this._products = products;
-  //   this.events.emit('products:changed')
-  // }
-
-  addItem(productId: string) {
-    const addProduct = this.products.find(product => product.id === productId);
+  addItem(id: string) {
+    const addProduct = this.products.find(product => product.id === id);
+    const index = this.basket.length + 1;
     if (addProduct) {
-      this.basket.push(addProduct);
+      this.basket.push({...addProduct, itemIndex: index});
       this.events.emit('basket:changed')
     } else {
-      console.log(`Товар с id ${productId} не найден`);
+      console.log(`Товар с id ${id} не найден`);
     }
   }
 
   removeItem(id: string) {
     this.basket = this.basket.filter(product => product.id !== id);
+    this.updateIndexes();
     this.events.emit('basket:changed')
+  }
+
+  isInBasket(id: string): boolean {
+    return this.basket.some(product => product.id === id);
+  }
+
+  updateIndexes() {
+    this.basket.forEach((product, index) => {
+      product.itemIndex = index + 1;
+    });
   }
 
   getBasket(): IProduct[] {

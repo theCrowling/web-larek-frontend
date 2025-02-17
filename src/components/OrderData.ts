@@ -46,6 +46,10 @@ export class OrderData extends Model<IOrderData[]> implements IOrderData {
     return Object.keys(errors).length === 0;
   }
 
+  getFormErrors() {
+    return this.formErrors;
+  }
+
   clearValidate() {
     this.formErrors = {};
     this.events.emit("order:validate:clear");

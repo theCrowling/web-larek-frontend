@@ -5,6 +5,7 @@ export interface IProduct {
   price: number;
   category: string;
   description: string;
+  itemIndex?: number;
 }
 
 export interface IOrderForm {
