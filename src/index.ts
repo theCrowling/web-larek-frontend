@@ -9,26 +9,20 @@ import { ProductCard } from './components/ProductCard';
 import { cloneTemplate, ensureElement } from './utils/utils';
 import { Modal } from './components/common/Modal';
 import { Basket } from './components/common/Basket';
+import { Page } from './components/Page';
 
 const api = new ShopAPI(CDN_URL, API_URL)
 const events = new EventEmitter();
 
 // Глобальные контейнеры
-// const page = new Page(document.body, events);
+const page = new Page(document.body, events);
 const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
-const basketElem = ensureElement<HTMLElement>('.header__basket'); // Вынести в класс Page
-const basketCounter = ensureElement<HTMLElement>('.header__basket-counter'); // Вынести в класс Page
-
-basketElem.addEventListener('click', () => { // Вынести в класс Page
-  events.emit('basket:open');
-});
 
 // Инициализация модели данных
 const productData = new ProductData(events);
 const orderData = new OrderData(events);
 
 // Инициализация компонентов
-const catalogSection = ensureElement<HTMLElement>('.gallery')
 const cardCatalogTemplate = ensureElement<HTMLTemplateElement>('#card-catalog');
 const cardPreviewTemplate = ensureElement<HTMLTemplateElement>('#card-preview');
 const cardBasketTemplate = ensureElement<HTMLTemplateElement>('#card-basket');
@@ -39,12 +33,12 @@ const basket = new Basket(cloneTemplate(basketTemplate), events);
 
 // Изменение каталога товаров
 events.on('products:changed', () => {
-  catalogSection.innerHTML = '';
-  productData.getProducts().forEach(product => {
+  const products = productData.getProducts().map(product => {
     const productCard = new ProductCard(cloneTemplate(cardCatalogTemplate), events);
     productCard.setData(product);
-    catalogSection.append(productCard.element);
+    return productCard.element;
   });
+  page.catalog = products;
   console.log('Товары изменены');
 });
 
@@ -80,7 +74,7 @@ events.on('basket:changed', () => {
   });
 
   basket.render({items: basketItems, total: productData.getTotal()});
-  basketCounter.textContent = productData.getBasket().length.toString(); // Вынести в класс Page
+  page.counter = productData.getBasket().length;
 });
 
 // Открытие корзины
@@ -89,6 +83,15 @@ events.on('basket:open', () => {
   modal.open();
 });
 
+// Блокируем прокрутку страницы если открыта модалка
+events.on('modal:open', () => {
+  page.locked = true;
+});
+
+// ... и разблокируем
+events.on('modal:close', () => {
+  page.locked = false;
+});
 
 // Получаем товары с сервера
 api.getProducts()
