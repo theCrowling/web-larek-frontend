@@ -32,10 +32,10 @@ export function ensureElement<T extends HTMLElement>(selectorElement: SelectorEl
     if (isSelector(selectorElement)) {
         const elements = ensureAllElements<T>(selectorElement, context);
         if (elements.length > 1) {
-            console.warn(`selector ${selectorElement} return more then one element`);
+            // console.warn(`selector ${selectorElement} return more then one element`);
         }
         if (elements.length === 0) {
-          console.warn(`selector ${selectorElement} return nothing`);
+          // console.warn(`selector ${selectorElement} return nothing`);
           return null
         }
         return elements.pop() as T;

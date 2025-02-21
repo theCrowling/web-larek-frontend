@@ -39,8 +39,6 @@ export class ProductData extends Model<IProduct[]> implements IProductData {
     if (addProduct) {
       this.basket.push({...addProduct, itemIndex: index});
       this.events.emit('basket:changed')
-    } else {
-      console.log(`Товар с id ${id} не найден`);
     }
   }
 

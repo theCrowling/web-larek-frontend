@@ -39,7 +39,7 @@ export interface IOrderData {
   setOrder(order: IOrder): void;
   getOrder(): IOrder;
   validateOrder(data: Record<keyof IOrderForm, string>): boolean;
-  clearValidate(): void;
+  clear(): void;
 }
 
 export type TBasketItem = Pick<IProduct, 'id' | 'title' | 'price'>;
