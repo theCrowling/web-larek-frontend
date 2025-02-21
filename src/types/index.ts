@@ -1,5 +1,5 @@
 export interface IProduct {
-  id: string;
+  readonly id: string;
   title: string;
   image: string;
   price: number;
@@ -36,9 +36,9 @@ export interface IProductData {
 }
 
 export interface IOrderData {
-  setOrder(order: IOrder): void;
   getOrder(): IOrder;
-  validateOrder(data: Record<keyof IOrderForm, string>): boolean;
+  setOrderField(field: keyof IOrderForm, value: string): void;
+  validateOrder(data: Partial<IOrderForm>): boolean;
   clear(): void;
 }
 

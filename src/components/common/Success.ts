@@ -1,16 +1,12 @@
+import { IOrderResult } from "../../types";
 import { ensureElement, formatNumber } from "../../utils/utils";
 import { Component } from "../base/Component";
-
-interface ISuccess {
-  id: string;
-  total: number;
-}
 
 interface ISuccessActions {
   onClick: () => void;
 }
 
-export class Success extends Component<ISuccess> {
+export class Success extends Component<IOrderResult> {
   protected _close: HTMLElement;
   protected _total: HTMLElement;
 

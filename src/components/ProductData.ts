@@ -5,13 +5,11 @@ import { Model } from "./base/Model";
 export class ProductData extends Model<IProduct[]> implements IProductData {
   private products: IProduct[];
   private basket: IProduct[];
-  // private preview: IProduct | null;
 
   constructor(events: IEvents) {
     super([], events);
     this.products = [];
     this.basket = [];
-    // this.preview = null;
   }
 
   setProducts(products: IProduct[]) {
@@ -27,14 +25,8 @@ export class ProductData extends Model<IProduct[]> implements IProductData {
     return this.products.find(product => product.id === id);
   }
 
-  // не используется
-  // setPreview(product: IProduct) {
-  //   this.preview = product;
-  //   this.events.emit('preview:changed', product)
-  // }
-
   addItem(id: string) {
-    const addProduct = this.products.find(product => product.id === id);
+    const addProduct = this.getProduct(id);
     const index = this.basket.length + 1;
     if (addProduct) {
       this.basket.push({...addProduct, itemIndex: index});

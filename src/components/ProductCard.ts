@@ -54,7 +54,7 @@ export class ProductCard extends Component<IProduct> {
     });
   }
 
-  setData(data: IProduct): void {
+  setData(data: IProduct, isInBasket?: boolean): void {
     this.id = data.id;
     this.setText(this.title, data.title);
     this.setText(this.price, data.price? `${formatNumber(data.price)} синапсов` : "Бесценно");
@@ -63,6 +63,7 @@ export class ProductCard extends Component<IProduct> {
     this.setText(this.category, data.category);
     this.category?.classList.add(this.colorCategory[data.category]);
     this.setText(this.itemIndex, String(data.itemIndex));
+    this.updateButtonState(data.price, isInBasket ?? false);
   }
 
   updateButtonState(price: number | null, isInBasket: boolean) {
@@ -75,17 +76,6 @@ export class ProductCard extends Component<IProduct> {
     } else {
       this.setDisabled(this.addButton, false);
       this.setText(this.addButton, "В корзину");
-    }
-  }
-
-  get cardId() {
-    return this.id;
-  }
-
-  removeProduct() {
-    if (this.element) {
-      this.element.remove();
-      this.element = null;
     }
   }
 }

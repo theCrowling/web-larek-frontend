@@ -25,13 +25,11 @@ export class Form<T> extends Component<IForm> {
 
     this.container.addEventListener('submit', (e: Event) => {
       e.preventDefault();
-      console.log(`Проверяю название эмита submit: ${this.container.name}`);
       this.events.emit(`${this.container.name}:submit`);
     });
   }
 
   protected onInputChange(field: keyof T, value: string) {
-    console.log(`Проверяю название эмита change': ${this.container.name}.${String(field)}:change`);
     this.events.emit(`${this.container.name}.${String(field)}:change`, {
         field,
         value

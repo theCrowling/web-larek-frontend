@@ -17,7 +17,6 @@ export class OrderData extends Model<IOrder[]> implements IOrderData {
       total: 0,
       items: []
     };
-    console.log("OrderData создан:", this.order);
   }
 
   set items(items: string[]) {
@@ -32,13 +31,7 @@ export class OrderData extends Model<IOrder[]> implements IOrderData {
 
   setPayment(payment: string | null) {
     this.order.payment = payment;
-    console.log("order после установкой payment:", this.order);
     this.events.emit("order:changed", this.order);
-  }
-
-  setOrder(order: IOrder) {
-    this.order = order;
-    this.events.emit("order:changed");
   }
 
   getOrder(): IOrder {
@@ -48,10 +41,9 @@ export class OrderData extends Model<IOrder[]> implements IOrderData {
   setOrderField(field: keyof IOrderForm, value: string) {
     this.order[field] = value;
 
-    if (this.validateOrder()) {
-      this.events.emit("order:ready", this.order);
-    }
-    if (this.validateСontact()) {
+    const isOrderValid = this.validateOrder();
+    const isContactValid = this.validateСontact();
+    if (isOrderValid && isContactValid) {
       this.events.emit("order:ready", this.order);
     }
   }

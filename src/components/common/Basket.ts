@@ -1,17 +1,3 @@
-/*#### Класс Basket
-Данный класс реализует корзину товаров и управляет содержимым.
-- `constructor(container: HTMLElement, events: IEvents)`
-
-Необходимые поля класса:
-- `list: HTMLElement` - контейнер списка товаров в корзине,
-- `total: HTMLElement` - элемент отображения суммы товаров,
-- `orderButton: HTMLButtonElement` - кнопка оформления заказа,
-
-Методы класса:
-- `items(items: HTMLElement[])` - отображение списка товаров в корзине,
-- `selected(items: string[])` - включает/отключает кнопку заказа в зависимости от наличия товаров в корзине,
-- `total(total: number)` - отображение суммы товаров в корзине,*/
-
 import { createElement, ensureElement, formatNumber } from "../../utils/utils";
 import { Component } from "../base/Component";
 import { IEvents } from "../base/events";

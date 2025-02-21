@@ -18,7 +18,6 @@ export class ShopAPI extends Api implements IShopAPI {
   getProducts(): Promise<IProduct[]> {
     return this.get("/product")
       .then((data: ApiListResponse<IProduct>) => {
-        console.log("Получаем из апи:", data);
         return data.items.map((item) => ({
             ...item,
             image: this.cdn + item.image,

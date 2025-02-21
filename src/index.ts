@@ -14,6 +14,7 @@ import { Contacts, Order } from './components/Order';
 import { FormErrors, IOrderForm } from './types';
 import { Success } from './components/common/Success';
 
+// Инициализация API и событий
 const api = new ShopAPI(CDN_URL, API_URL)
 const events = new EventEmitter();
 
@@ -25,7 +26,7 @@ const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
 const productData = new ProductData(events);
 const orderData = new OrderData(events);
 
-// Инициализация компонентов
+// Переменные шаблонов
 const cardCatalogTemplate = ensureElement<HTMLTemplateElement>('#card-catalog');
 const cardPreviewTemplate = ensureElement<HTMLTemplateElement>('#card-preview');
 const cardBasketTemplate = ensureElement<HTMLTemplateElement>('#card-basket');
@@ -54,11 +55,9 @@ events.on('product:click', ({id}: {id: string}) => {
   const product = productData.getProduct(id);
   const isInBasket = productData.isInBasket(id);
   const productCardModal = new ProductCard(cloneTemplate(cardPreviewTemplate), events);
-  productCardModal.setData(product);
-  productCardModal.updateButtonState(product.price, isInBasket);
+  productCardModal.setData(product, isInBasket);
 
   modal.render({content: productCardModal.element})
-  console.log("Модальное окно открыто с товаром:", product);
 });
 
 // Добавление товара в корзину
@@ -74,19 +73,18 @@ events.on('basket:remove', ({id}: {id: string}) => {
 // Обновление корзины
 events.on('basket:changed', () => {
   const basketItems = productData.getBasket().map(product => {
-    const productCardBasket = new ProductCard(cloneTemplate(cardBasketTemplate), events);
-    productCardBasket.setData(product);
-    console.log('Элемент корзины:', productCardBasket.element);
-    return productCardBasket.element
+    const cardBasket = new ProductCard(cloneTemplate(cardBasketTemplate), events);
+    cardBasket.setData(product);
+    return cardBasket.element
   });
 
   basket.render({items: basketItems, total: productData.getTotal()});
-  page.counter = productData.getBasket().length;
+  page.counter = basketItems.length;
 });
 
 // Открытие корзины
 events.on('basket:open', () => {
-  modal.render({ content: basket.render({}) });
+  modal.render({ content: basket.render({total: productData.getTotal()}) });
 });
 
 // Открытие формы заказа
@@ -115,9 +113,39 @@ events.on('order:submit', () => {
   });
 });
 
+// Изменение способа оплаты
+events.on("order:payment", ({payment}: {payment: string | null}) => {
+  orderData.setPayment(payment);
+});
+
+// Проверка формы оплаты
+events.on('formErrorsOrder:change', (errors: Partial<FormErrors>) => {
+  const { payment, address } = errors;
+  order.errors = Object.values({ payment, address }).filter(i => !!i).join('; ');
+  order.valid = !payment && !address;
+})
+
+// Проверка формы контактов
+events.on('formErrorsContact:change', (errors: Partial<FormErrors>) => {
+  const { email, phone } = errors;
+  contacts.errors = Object.values({ email, phone }).filter(i => !!i).join('; ');
+  contacts.valid = !email && !phone;
+})
+
+// Изменение полей формы
+events.on(/^(order|contacts)\..*:change/, (data: { field: keyof IOrderForm, value: string }) => {
+  orderData.setOrderField(data.field, data.value);
+});
+
+// Для отслеживания изменений в данных заказа
+events.on('order:changed', () => {
+  orderData.validateOrder();
+  orderData.validateСontact();
+});
+
 // Отправка формы заказа
 events.on('contacts:submit', () => {
-  console.log("Текущий заказ:", orderData.getOrder());
+  console.log('Текущий заказ:', orderData.getOrder());
   api.postOrder(orderData.getOrder())
     .then((result) => {
       const success = new Success(cloneTemplate(successTemplate), {
@@ -127,45 +155,13 @@ events.on('contacts:submit', () => {
       });
       modal.render({ content: success.render({total: result.total}) });
       productData.clearBasket();
-      console.log("Заказ успешно отправлен:", result)
+      console.log('Заказ успешно отправлен:', result)
     })
     .catch((err) => {
-      console.error("Ошибка при отправке заказа:", err);
+      console.error('Ошибка при отправке заказа:', err);
       contacts.errors = (`Ошибка при отправке заказа: ${err}`);
     })
 });
-
-// Изменение способа оплаты
-events.on("order:payment", ({payment}: {payment: string | null}) => {
-  orderData.setPayment(payment);
-});
-
-
-events.on('formErrorsOrder:change', (errors: Partial<FormErrors>) => {
-  console.log("🔥 Ошибки формы оплаты обновились:", errors);
-  const { payment, address } = errors;
-  order.errors = Object.values({ payment, address }).filter(i => !!i).join('; ');
-  order.valid = !payment && !address;
-})
-
-
-events.on('formErrorsContact:change', (errors: Partial<FormErrors>) => {
-  console.log("🔥 Ошибки формы контактов обновились:", errors);
-  const { email, phone } = errors;
-  contacts.errors = Object.values({ email, phone }).filter(i => !!i).join('; ');
-  contacts.valid = !email && !phone;
-})
-
-// Поля первого экрана (способ оплаты, адрес)
-events.on(/^(order|contacts)\..*:change/, (data: { field: keyof IOrderForm, value: string }) => {
-  orderData.setOrderField(data.field, data.value);
-});
-
-// Для отслеживания изменений в данных заказа (потом удалить)
-events.on('order:changed', () => {
-  orderData.validateOrder()
-});
-
 
 // Блокируем прокрутку страницы если открыта модалка
 events.on('modal:open', () => {
@@ -181,10 +177,7 @@ events.on('modal:close', () => {
 api.getProducts()
     .then(result => {
         productData.setProducts(result);
-        console.log('Получено с сервера:', result);
-        productData.addItem(result[6].id);
-        productData.addItem(result[7].id);
     })
     .catch(err => {
-        console.error(err);
+        console.error('Ошибка загрузки с сервера:', err);
     });
